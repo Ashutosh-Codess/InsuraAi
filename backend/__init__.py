@@ -1,0 +1,1 @@
+"""Backend package marker so backend.main can be imported from the repo root."""
