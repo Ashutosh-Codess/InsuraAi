@@ -1,0 +1,70 @@
+services:
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    environment:
+      # If not in .env, fallback to these defaults
+      POSTGRES_USER: ${POSTGRES_USER:-insuramind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-insuramind}
+      POSTGRES_DB: ${POSTGRES_DB:-insuramind}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  ollama-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - ollama
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for Ollama to be ready...';
+      while ! curl -s http://ollama:11434/api/tags > /dev/null; do sleep 2; done;
+      echo 'Ollama is ready. Pulling llama3 model...';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"qwen2.5:0.5b\"}';
+      echo 'Model pulled successfully.';
+      "
+
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      PYTHONPATH: "/:/app"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./agents:/agents
+      - ./guardrails:/guardrails
+      - ./rag:/rag
+      - ./vector_db:/vector_db
+      - ./data:/app/data
+      - ./prompts:/prompts
+    depends_on:
+      - db
+      - ollama
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+  ollama_data:
