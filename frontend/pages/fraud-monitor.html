@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="InsurAI Fraud Monitor - Real-time anomaly detection and risk scoring for insurance agents.">
+  <title>Agent Fraud Monitor - InsurAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center">A</div>
+        <span class="font-bold text-white text-lg">
+          Insur<span class="text-indigo-400">AI</span>
+          <span class="text-xs bg-rose-950 text-rose-400 border border-rose-800 px-2 py-0.5 rounded-md ml-2">Fraud Intel</span>
+        </span>
+        <a href="/pages/copilot.html" class="ml-4 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">Agent Copilot</a>
+      </div>
+      <div id="nav-user-info"></div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-white">Fraud Risk Monitoring</h1>
+        <p class="text-slate-400 text-sm">Real-time anomaly detection and risk scoring on incoming claims.</p>
+      </div>
+      <span id="anomaly-summary" class="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-300 text-xs font-bold rounded-xl flex items-center gap-2 self-start">
+        <span class="w-2 h-2 rounded-full bg-slate-400"></span> Loading live claim data…
+      </span>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-1 animate-fadeIn">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Flagged</div>
+        <div id="total-flagged" class="text-2xl font-bold text-white">—</div>
+        <div class="text-xs text-slate-500">Live analysis results</div>
+      </div>
+      <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-1 animate-fadeIn">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Avg Fraud Score</div>
+        <div id="average-fraud-score" class="text-2xl font-bold text-amber-400">—</div>
+        <div class="text-xs text-slate-500">Across analyzed claims</div>
+      </div>
+      <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-1 animate-fadeIn">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Prevented Payouts</div>
+        <div id="review-value" class="text-2xl font-bold text-emerald-400">—</div>
+        <div class="text-xs text-slate-500">Amount awaiting review</div>
+      </div>
+      <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-1 animate-fadeIn">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Pending Review</div>
+        <div id="pending-review" class="text-2xl font-bold text-indigo-400">—</div>
+        <div class="text-xs text-slate-500">Submitted or under review</div>
+      </div>
+    </div>
+
+    <!-- Suspicious Claims Table -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <span class="font-bold text-sm text-slate-200">Suspicious Claims Queue</span>
+        <span class="text-xs text-slate-500">Sorted by risk score</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
+            <tr>
+              <th class="p-4">Claim ID</th>
+              <th class="p-4">Customer</th>
+              <th class="p-4">Amount</th>
+              <th class="p-4">Risk Level</th>
+              <th class="p-4">Anomaly Flag</th>
+              <th class="p-4 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="agent-claims-list" class="divide-y divide-slate-800"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <section id="analysis-panel" class="hidden bg-slate-900 border border-indigo-800 rounded-2xl p-5">
+      <h2 class="font-bold text-indigo-200">AI Claim Analysis</h2>
+      <p id="analysis-claim-label" class="mt-1 text-xs text-slate-400"></p>
+      <div class="mt-4 space-y-4 text-sm">
+        <div><h3 class="font-semibold text-white">Adjudication recommendation</h3><p id="analysis-adjudication" class="mt-1 leading-6 text-slate-300"></p></div>
+        <div><h3 class="font-semibold text-white">Fraud assessment</h3><p id="analysis-fraud" class="mt-1 leading-6 text-slate-300"></p></div>
+        <div><h3 class="font-semibold text-white">Next step</h3><p id="analysis-next-step" class="mt-1 leading-6 text-slate-300"></p></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/js/state.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/nav.js"></script>
+  <script>
+    const escapeHtml = value => String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+    const claimLabel = id => String(id).slice(0, 8).toUpperCase();
+    const renderClaims = claims => {
+      const list = document.getElementById('agent-claims-list');
+      if (!claims.length) {
+        list.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400">No claims are waiting for review.</td></tr>';
+        return;
+      }
+      list.innerHTML = claims.map(claim => `
+        <tr class="hover:bg-slate-800/50 transition-colors">
+          <td class="p-4 font-mono font-bold text-white">${claimLabel(claim.id)}</td>
+          <td class="p-4 text-slate-300">${escapeHtml(claim.customer_name || 'Customer')}</td>
+          <td class="p-4 font-semibold text-slate-100">${Utils.formatCurrency(claim.claimed_amount)}</td>
+          <td class="p-4"><span class="px-2.5 py-1 bg-amber-950 text-amber-300 border border-amber-800 rounded-full font-bold text-xs">${escapeHtml(claim.status)}</span></td>
+          <td class="p-4 text-slate-400">${escapeHtml(claim.fraud_label || 'Awaiting AI analysis')}</td>
+          <td class="p-4 text-right space-x-2 whitespace-nowrap">
+            <button onclick="runAnalysis('${claim.id}')" class="px-3 py-1.5 bg-indigo-900 hover:bg-indigo-800 text-indigo-200 rounded-lg font-semibold">Run AI</button>
+            <button onclick="decideClaim('${claim.id}', 'approved')" class="px-3 py-1.5 bg-emerald-900 hover:bg-emerald-800 text-emerald-200 rounded-lg font-semibold">Approve</button>
+            <button onclick="decideClaim('${claim.id}', 'rejected')" class="px-3 py-1.5 bg-rose-900 hover:bg-rose-800 text-rose-200 rounded-lg font-semibold">Reject</button>
+          </td>
+        </tr>`).join('');
+    };
+    const updateMetrics = claims => {
+      const reviewed = claims.filter(claim => Number(claim.fraud_score) >= 0.4);
+      const pending = claims.filter(claim => ['submitted', 'under_review'].includes(claim.status));
+      const analyzed = claims.filter(claim => claim.fraud_score !== null && claim.fraud_score !== undefined);
+      const average = analyzed.length ? analyzed.reduce((sum, claim) => sum + Number(claim.fraud_score), 0) / analyzed.length : 0;
+      document.getElementById('total-flagged').textContent = reviewed.length;
+      document.getElementById('average-fraud-score').textContent = analyzed.length ? `${Math.round(average * 100)}%` : 'Not analyzed';
+      document.getElementById('review-value').textContent = Utils.formatCurrency(pending.reduce((sum, claim) => sum + Number(claim.claimed_amount || 0), 0));
+      document.getElementById('pending-review').textContent = pending.length;
+      const summary = document.getElementById('anomaly-summary');
+      summary.innerHTML = `<span class="w-2 h-2 rounded-full ${reviewed.length ? 'bg-rose-500' : 'bg-emerald-500'}"></span> ${reviewed.length ? `${reviewed.length} claim${reviewed.length === 1 ? '' : 's'} require review` : 'No high-risk anomalies detected'}`;
+    };
+    const loadClaims = async () => {
+      try {
+        const claims = await API.get('/claims');
+        renderClaims(claims);
+        updateMetrics(claims);
+      } catch (_) {
+        renderClaims([]);
+      }
+    };
+    async function runAnalysis(id) {
+      UI.toast('Running AI analysis. This can take a moment…', 'info');
+      try {
+        const result = await API.post(`/claims/${id}/run-analysis`, {});
+        document.getElementById('analysis-claim-label').textContent = `Claim ${claimLabel(id)}`;
+        document.getElementById('analysis-adjudication').textContent = result.adjudication;
+        document.getElementById('analysis-fraud').textContent = result.fraud_analysis;
+        document.getElementById('analysis-next-step').textContent = result.review_reason || 'No additional action is required.';
+        const panel = document.getElementById('analysis-panel');
+        panel.classList.remove('hidden');
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        UI.toast('AI analysis completed.', 'success');
+        loadClaims();
+      } catch (_) {}
+    }
+    async function decideClaim(id, decision) {
+      try {
+        await API.post(`/claims/${id}/decision`, { decision, notes: `Decision recorded by agent.` });
+        UI.toast(`Claim ${claimLabel(id)} ${decision}.`, 'success');
+        loadClaims();
+      } catch (_) {}
+    }
+    document.addEventListener('DOMContentLoaded', loadClaims);
+  </script>
+</body>
+</html>
