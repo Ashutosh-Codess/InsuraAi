@@ -1,0 +1,77 @@
+ Volume in drive C is Windows-SSD
+ Volume Serial Number is A2F5-FCFC
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend
+
+26-07-2026  13:40               207 main.py
+               1 File(s)            207 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\app
+
+26-07-2026  13:40                 0 __init__.py
+               1 File(s)              0 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\app\api
+
+26-07-2026  13:40               488 router.py
+26-07-2026  13:40                 0 __init__.py
+               2 File(s)            488 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\app\api\v1
+
+26-07-2026  13:40             2,068 auth.py
+26-07-2026  13:40             6,838 claims.py
+26-07-2026  13:40             3,081 copilot.py
+26-07-2026  13:40             2,589 customers.py
+26-07-2026  13:40               181 health.py
+26-07-2026  13:40             1,754 policies.py
+26-07-2026  13:40                 0 __init__.py
+               7 File(s)         16,511 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\app\core
+
+26-07-2026  13:40               465 config.py
+26-07-2026  13:40               438 database.py
+26-07-2026  13:40             2,011 security.py
+26-07-2026  13:40                 0 __init__.py
+               4 File(s)          2,914 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\app\models
+
+26-07-2026  13:40             1,861 claim.py
+26-07-2026  13:40             1,163 customer.py
+26-07-2026  13:40             1,347 policy.py
+26-07-2026  13:40               668 user.py
+26-07-2026  13:40                 0 __init__.py
+               5 File(s)          5,039 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\app\schemas
+
+26-07-2026  13:40               894 claim.py
+26-07-2026  13:40               769 customer.py
+26-07-2026  13:40               793 policy.py
+26-07-2026  13:40                 0 __init__.py
+               4 File(s)          2,456 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\app\services
+
+26-07-2026  13:40             1,519 agent_service.py
+26-07-2026  13:40             1,578 cv_service.py
+26-07-2026  13:40             1,250 ocr_service.py
+26-07-2026  13:40             1,378 risk_service.py
+26-07-2026  13:40                 0 __init__.py
+               5 File(s)          5,725 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\migrations
+
+26-07-2026  13:40             1,200 env.py
+               1 File(s)          1,200 bytes
+
+ Directory of C:\Users\ashu1\Downloads\insuramind-ai-fixed\insuramind-ai\backend\migrations\versions
+
+26-07-2026  13:40             4,314 0001_initial.py
+               1 File(s)          4,314 bytes
+
+     Total Files Listed:
+              31 File(s)         38,854 bytes
+               0 Dir(s)  10,871,275,520 bytes free
