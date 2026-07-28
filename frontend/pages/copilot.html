@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="InsurAI AI Copilot - Ask real-time questions about your policy, guidelines, or claim status.">
+  <title>AI Copilot - InsurAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-8">
+        <a href="/index.html" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center">I</div>
+          <span class="font-bold text-slate-900 text-lg">Insur<span class="text-indigo-600">AI</span></span>
+        </a>
+        <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+          <a href="/pages/dashboard.html" class="hover:text-slate-900 transition-colors">Dashboard</a>
+          <a href="/pages/claims.html" class="hover:text-slate-900 transition-colors">Claims</a>
+          <a href="/pages/copilot.html" class="text-indigo-600 font-semibold">AI Copilot</a>
+        </nav>
+      </div>
+      <div id="nav-user-info"></div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8 flex-1 w-full flex flex-col">
+    <div class="mb-6">
+      <h1 id="copilot-title" class="text-3xl font-extrabold text-slate-900">Insurance Assistant Copilot</h1>
+      <p id="copilot-subtitle" class="text-slate-500 text-sm">Ask real-time questions about your policy, guidelines, or file status.</p>
+    </div>
+
+    <div id="copilot-chat-container" class="flex-1 min-h-[550px]"></div>
+  </main>
+
+  <script src="/assets/js/state.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/nav.js"></script>
+  <script src="/components/chat.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.getUser();
+      if (user && ['agent', 'admin'].includes(user.role)) {
+        document.getElementById('copilot-title').textContent = 'Agent Claims Copilot';
+        document.getElementById('copilot-subtitle').textContent = 'Ask for claim-review guidance, fraud checks, or policy information.';
+      }
+      ChatComponent.init('copilot-chat-container');
+    });
+  </script>
+</body>
+</html>

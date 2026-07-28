@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="InsurAI Customer Dashboard - Track your active policies, open claims, and payout history.">
+  <title>Customer Dashboard - InsurAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-8">
+        <a href="/index.html" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center">I</div>
+          <span class="font-bold text-slate-900 text-lg">Insur<span class="text-indigo-600">AI</span></span>
+        </a>
+        <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
+          <a href="/pages/dashboard.html" class="text-indigo-600 font-semibold">Dashboard</a>
+          <a href="/pages/claims.html" class="hover:text-slate-900 transition-colors">Claims</a>
+          <a href="/pages/copilot.html" class="hover:text-slate-900 transition-colors">AI Copilot</a>
+        </nav>
+      </div>
+      <div id="nav-user-info"></div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900">Overview</h1>
+        <p class="text-slate-500 text-sm">Track your active policy claims and status updates.</p>
+      </div>
+      <a href="/pages/claims.html" id="file-claim-btn"
+        class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all self-start">
+        + File New Claim
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 animate-fadeIn">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Policies</span>
+        <div id="active-policies-count" class="text-3xl font-extrabold text-slate-900">—</div>
+        <p id="active-policies-types" class="text-xs text-emerald-600 font-medium">Loading policies…</p>
+      </div>
+      <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 animate-fadeIn">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Open Claims</span>
+        <div id="open-claims-count" class="text-3xl font-extrabold text-indigo-600">—</div>
+        <p class="text-xs text-amber-600 font-medium">Submitted or under review</p>
+      </div>
+      <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 animate-fadeIn">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Disbursed</span>
+        <div id="total-disbursed" class="text-3xl font-extrabold text-slate-900">—</div>
+        <p class="text-xs text-slate-400">Lifetime payouts</p>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="text-xl font-bold text-slate-900">Recent Claims</h2>
+      <div id="dashboard-claims-list" class="space-y-3"></div>
+    </div>
+  </main>
+
+  <script src="/assets/js/state.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/nav.js"></script>
+  <script src="/components/claims.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Promise.all([API.get('/claims/mine'), API.get('/policies/mine')]).then(([claims, policies]) => {
+        ClaimsComponent.renderList(claims.slice(0, 5), 'dashboard-claims-list');
+        document.getElementById('active-policies-count').textContent = policies.length;
+        document.getElementById('active-policies-types').textContent = policies.map(p => p.type).join(', ') || 'No active policies';
+        document.getElementById('open-claims-count').textContent = claims.filter(c => ['submitted', 'under_review'].includes(c.status)).length;
+        document.getElementById('total-disbursed').textContent = Utils.formatCurrency(claims.reduce((sum, c) => sum + Number(c.approved_amount || 0), 0));
+      }).catch(() => ClaimsComponent.renderList([], 'dashboard-claims-list'));
+    });
+  </script>
+</body>
+</html>

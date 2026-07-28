@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="InsurAI Agent Portal - Secure access for fraud officers and insurance adjusters.">
+  <title>Agent Portal Login - InsurAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-6">
+
+  <div class="w-full max-w-md bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6">
+    <div class="text-center space-y-2">
+      <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white font-bold text-2xl flex items-center justify-center mx-auto shadow-lg shadow-indigo-500/30">
+        A
+      </div>
+      <h1 class="text-2xl font-bold text-white">Agent &amp; Special Investigations</h1>
+      <p class="text-xs text-slate-400">Secure access for fraud officers and adjusters</p>
+    </div>
+
+    <form id="agent-login-form" class="space-y-4">
+      <div>
+        <label for="agent-email" class="block text-xs font-semibold text-slate-300 mb-1.5">Agent Work Email</label>
+        <input type="email" id="agent-email" required placeholder="agent@insurai.com"
+          class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div>
+        <label for="agent-password" class="block text-xs font-semibold text-slate-300 mb-1.5">Security Passcode</label>
+        <input type="password" id="agent-password" required placeholder="••••••••"
+          class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <button type="submit"
+        class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition-all">
+        Authenticate Session
+      </button>
+    </form>
+
+    <div class="text-center pt-2">
+      <a href="/index.html" class="text-xs text-slate-500 hover:text-slate-300 transition-colors">&larr; Back to Main Home</a>
+    </div>
+  </div>
+
+  <script src="/assets/js/state.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script>
+    document.getElementById('agent-login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('agent-email').value;
+      const pass = document.getElementById('agent-password').value;
+      Auth.login(email, pass, 'agent');
+    });
+  </script>
+</body>
+</html>
