@@ -1,0 +1,9 @@
+SAMPLE DOCUMENT - replace with real labor rate and parts pricing data before relying on this for actual repair cost assessments.
+
+Vehicle Repair Cost Reference
+
+Standard labor rate for body panel repair: regional average, varies by garage tier (authorized service center vs independent garage).
+
+Depreciation schedule for replaced parts: rubber/plastic parts depreciate 50% after the first year; metal parts depreciate on a straight-line basis over the vehicle's expected life; batteries and tires follow a separate depreciation table.
+
+A repair estimate significantly above the regional average for the same damage type and vehicle category should be cross-checked against the depreciation schedule before payout is approved.

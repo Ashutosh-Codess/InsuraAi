@@ -1,0 +1,9 @@
+SAMPLE DOCUMENT - replace with your actual jurisdiction's regulatory text before relying on this for compliance decisions.
+
+Claims Processing Regulatory Guidelines (Sample)
+
+Turnaround time: insurers must acknowledge receipt of a claim within a defined period and communicate a decision within the regulator-mandated window from the date all required documents were submitted.
+
+Disclosure: any rejection of a claim must be communicated in writing with the specific reason for rejection, referencing the applicable policy clause or exclusion.
+
+Automated decisions: claims processed with the assistance of automated or AI-based systems must remain subject to human review before a final rejection is communicated to the customer.

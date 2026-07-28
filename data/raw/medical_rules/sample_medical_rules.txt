@@ -1,0 +1,9 @@
+SAMPLE DOCUMENT - replace with real medical coding/pricing guidelines before relying on this for actual claim decisions.
+
+Standard Treatment Cost Guidelines
+
+Routine diagnostic blood tests should not exceed the regional standard rate by more than 20%. Charges significantly above this range should be flagged for review.
+
+Length-of-stay guidelines: routine appendectomy recovery is typically 2-3 days. Claims showing significantly longer hospital stays without a documented complication should be flagged for review.
+
+Standard room rent is capped at the amount specified in the policy schedule; charges for a room category above what the policy covers are payable only up to the policy's room rent limit, with associated charges (like doctor visit fees) proportionately adjusted.
