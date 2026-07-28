@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: InsuraMind AI API
+  version: "1.0.0"
+  description: >
+    Hand-maintained reference covering the endpoints that actually exist
+    in this repo. The canonical, always-accurate spec is served live by
+    FastAPI once the backend is running:
+
+        curl http://localhost:8000/api/v1/openapi.json > docs/api_specs.openapi.yaml
+
+    (or just browse http://localhost:8000/docs). This file exists for
+    offline reading and is worth regenerating after any route changes.
+
+servers:
+  - url: http://localhost:8000/api/v1
+
+paths:
+  /health:
+    get:
+      summary: Liveness check
+      responses:
+        "200":
+          description: OK
+
+  /auth/register:
+    post:
+      summary: Register a new customer account
+      description: Always creates role=customer. Agent/admin accounts are not created through this endpoint.
+      responses:
+        "200":
+          description: Created user
+        "400":
+          description: Email already registered
+
+  /auth/login:
+    post:
+      summary: Log in (OAuth2 password form - username field holds the email)
+      responses:
+        "200":
+          description: Access token
+        "401":
+          description: Incorrect email or password
+
+  /auth/me:
+    get:
+      summary: Get the current authenticated user
+      security: [{ bearerAuth: [] }]
+
+  /customers/me:
+    post:
+      summary: Create the current user's customer profile (risk score computed automatically)
+      security: [{ bearerAuth: [] }]
+    get:
+      summary: Get the current user's customer profile
+      security: [{ bearerAuth: [] }]
+    put:
+      summary: Update the current user's customer profile (risk score recalculated)
+      security: [{ bearerAuth: [] }]
+
+  /customers/{customer_id}:
+    get:
+      summary: Look up a customer by ID (agent/admin only)
+      security: [{ bearerAuth: [] }]
+
+  /policies:
+    get:
+      summary: List active policies in the catalog (optionally filtered by type)
+    post:
+      summary: Create a policy (admin only)
+      security: [{ bearerAuth: [] }]
+
+  /policies/{policy_id}:
+    get:
+      summary: Get a single policy
+
+  /customers/{customer_id}/policies:
+    get:
+      summary: List policies belonging to a customer
+
+  /claims:
+    post:
+      summary: Submit a new claim
+      security: [{ bearerAuth: [] }]
+    get:
+      summary: List claims (agent/admin only - the claim queue)
+      security: [{ bearerAuth: [] }]
+
+  /claims/mine:
+    get:
+      summary: List the current customer's own claims
+      security: [{ bearerAuth: [] }]
+
+  /claims/{claim_id}:
+    get:
+      summary: Get a single claim (customer sees only their own, agent/admin sees any)
+      security: [{ bearerAuth: [] }]
+
+  /claims/{claim_id}/documents:
+    post:
+      summary: Upload a document to a claim - runs OCR quality check or damage detection depending on doc_type
+      security: [{ bearerAuth: [] }]
+
+  /claims/{claim_id}/run-analysis:
+    post:
+      summary: Run the claim adjudication + fraud investigation crews against this claim (agent/admin only)
+      security: [{ bearerAuth: [] }]
+
+  /claims/{claim_id}/decision:
+    post:
+      summary: Record an agent's final approve/reject decision (agent/admin only)
+      security: [{ bearerAuth: [] }]
+
+  /copilot/search:
+    post:
+      summary: Search a knowledge base collection directly (no LLM call, raw retrieval)
+
+  /copilot/ask:
+    post:
+      summary: Ask the copilot a question - streamed, RAG-grounded response
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
