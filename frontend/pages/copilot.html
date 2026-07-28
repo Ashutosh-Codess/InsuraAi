@@ -49,8 +49,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       const user = Auth.getUser();
       if (user && ['agent', 'admin'].includes(user.role)) {
-        document.getElementById('copilot-title').textContent = 'Agent Claims Copilot';
-        document.getElementById('copilot-subtitle').textContent = 'Ask for claim-review guidance, fraud checks, or policy information.';
+        window.location.replace('/pages/agent-copilot.html');
+        return;
       }
       ChatComponent.init('copilot-chat-container');
     });

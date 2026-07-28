@@ -50,7 +50,7 @@ const UploaderComponent = {
       formData.append('documents', file);
       const item = document.createElement('div');
       item.className = 'text-xs p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center';
-      item.innerHTML = `<span>&#128196; ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span> <span class="text-emerald-500 font-medium">Ready</span>`;
+      item.innerHTML = `<span>&#128196; ₹{file.name} (₹{(file.size / 1024).toFixed(1)} KB)</span> <span class="text-emerald-500 font-medium">Ready</span>`;
       listContainer.appendChild(item);
     });
     try {

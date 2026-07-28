@@ -12,6 +12,7 @@ Performance notes:
     500 crash.
 """
 import os
+import re
 
 import httpx
 import yaml
@@ -108,40 +109,77 @@ def _claim_number(claim_id) -> str:
     return f"CLM-{str(claim_id).replace('-', '')[:8].upper()}"
 
 
+def _matches_question(value: str, question: str) -> bool:
+    """Match an ID/name fragment supplied by a user without exposing other data."""
+    normal_value = re.sub(r"[^a-z0-9]", "", str(value).lower())
+    normal_question = re.sub(r"[^a-z0-9]", "", question.lower())
+    return len(normal_value) >= 5 and normal_value in normal_question
+
+
+def _agent_claim_line(claim: Claim, db: Session) -> str:
+    customer = db.get(Customer, claim.customer_id)
+    policy = db.get(Policy, claim.policy_id)
+    fraud = (
+        f"; fraud assessment: {claim.fraud_label} ({float(claim.fraud_score):.0%})"
+        if claim.fraud_score is not None else "; fraud assessment: not run"
+    )
+    return (
+        f"• {_claim_number(claim.id)} — {customer.name if customer else 'Unknown customer'}; "
+        f"policy {_policy_number(claim.policy_id)} ({policy.name if policy else claim.type}); "
+        f"{claim.type} claim for ₹{float(claim.claimed_amount):,.2f}; status: {claim.status}{fraud}."
+    )
+
+
 @router.post("/copilot/contextual-chat")
 def contextual_chat(
     payload: ContextualChatRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Return role-scoped insurance context without waiting for an external LLM."""
+    """Return question-specific, role-scoped live insurance context."""
     question = payload.message.strip() or "account overview"
+    query = question.lower()
 
     if current_user.role in {"agent", "admin"}:
         claims = db.query(Claim).order_by(Claim.submitted_at.desc()).all()
         customers = db.query(Customer).all()
+        identified = next((claim for claim in claims if _matches_question(_claim_number(claim.id), question) or _matches_question(claim.id, question)), None)
+        if identified:
+            return {"reply": f"Claim details for {_claim_number(identified.id)}:\n{_agent_claim_line(identified, db)}\n\nYou can run AI analysis from the Fraud Monitor before recording a decision."}
+
+        high_risk = [claim for claim in claims if claim.fraud_score is not None and float(claim.fraud_score) >= 0.4]
+        pending = [claim for claim in claims if claim.status in {"submitted", "under_review"}]
+        if any(term in query for term in ("risk", "fraud", "suspicious", "flagged", "high risk")):
+            selected = high_risk
+            heading = "Claims currently flagged for fraud review"
+            if not selected:
+                return {"reply": "No claims are currently flagged for fraud review. You can run AI analysis from the Fraud Monitor to assess unreviewed claims."}
+        elif any(term in query for term in ("pending", "queue", "review", "submitted")):
+            selected = pending
+            heading = "Claims awaiting agent review"
+            if not selected:
+                return {"reply": "There are no claims waiting for agent review right now."}
+        else:
+            selected = []
+            heading = ""
+
+        if not selected:
+            matched_customer = next((customer for customer in customers if customer.name and customer.name.lower() in query), None)
+            if matched_customer:
+                selected = [claim for claim in claims if claim.customer_id == matched_customer.id]
+                heading = f"Claims for {matched_customer.name}"
+
+        if selected:
+            lines = [f"{heading} ({len(selected)}):", *[_agent_claim_line(claim, db) for claim in selected]]
+            return {"reply": "\n".join(lines)}
+
+        total_value = sum(float(claim.claimed_amount or 0) for claim in pending)
         lines = [
-            f"Agent portfolio answer for: {question}",
-            f"There are {len(customers)} customer profiles and {len(claims)} claims in the review queue.",
-            "",
-            "Claim review details:",
+            f"Agent portfolio summary for: {question}",
+            f"There are {len(customers)} customers, {len(claims)} total claims, and {len(pending)} awaiting review (₹{total_value:,.2f}).",
+            f"{len(high_risk)} claim(s) have a fraud score of 40% or higher.",
+            "Ask for the review queue, high-risk claims, a customer name, or a claim number for a focused answer.",
         ]
-        if not claims:
-            lines.append("No claims have been filed yet.")
-        for claim in claims:
-            customer = db.get(Customer, claim.customer_id)
-            policy = db.get(Policy, claim.policy_id)
-            customer_name = customer.name if customer else "Unknown customer"
-            policy_no = _policy_number(claim.policy_id)
-            fraud = f"; fraud assessment: {claim.fraud_label} ({float(claim.fraud_score):.0%})" if claim.fraud_score is not None else "; fraud assessment: not run"
-            lines.append(
-                f"• {_claim_number(claim.id)} — {customer_name}; policy {policy_no} ({policy.name if policy else claim.type}); "
-                f"{claim.type} claim for ${float(claim.claimed_amount):,.2f}; status: {claim.status}{fraud}."
-            )
-        lines.extend([
-            "",
-            "Use the claim number and policy number above when reviewing evidence, running an analysis, or recording an approval/rejection.",
-        ])
         return {"reply": "\n".join(lines)}
 
     customer = db.query(Customer).filter(Customer.user_id == current_user.id).first()
@@ -150,31 +188,27 @@ def contextual_chat(
 
     policies = db.query(Policy).filter(Policy.customer_id == customer.id).all()
     claims = db.query(Claim).filter(Claim.customer_id == customer.id).order_by(Claim.submitted_at.desc()).all()
-    lines = [
-        f"Your insurance account answer for: {question}",
-        f"Customer: {customer.name}",
-        "",
-        "Your policies:",
-    ]
-    if not policies:
-        lines.append("You do not currently have a policy on file.")
-    for policy in policies:
-        lines.append(
-            f"• {_policy_number(policy.id)} — {policy.name} ({policy.type}), {policy.status}; "
-            f"coverage ${float(policy.coverage_amount):,.2f}; deductible ${float(policy.deductible or 0):,.2f}; "
-            f"premium ${float(policy.premium_amount):,.2f}. {policy.coverage_details or ''}".strip()
-        )
-    lines.extend(["", "Your claims:"])
-    if not claims:
-        lines.append("You have not filed any claims yet.")
-    for claim in claims:
-        approved = f"; approved amount ${float(claim.approved_amount):,.2f}" if claim.approved_amount is not None else ""
-        lines.append(
-            f"• {_claim_number(claim.id)} — {claim.type} claim for ${float(claim.claimed_amount):,.2f}; "
-            f"status: {claim.status}{approved}; filed {claim.submitted_at.strftime('%d %b %Y')}."
-        )
-    lines.extend(["", "You can ask about a policy number, coverage amount, claim status, or why a claim needs review."])
-    return {"reply": "\n".join(lines)}
+    identified_claim = next((claim for claim in claims if _matches_question(_claim_number(claim.id), question) or _matches_question(claim.id, question)), None)
+    if identified_claim:
+        approved = f" Approved amount: ₹{float(identified_claim.approved_amount):,.2f}." if identified_claim.approved_amount is not None else ""
+        return {"reply": f"{_claim_number(identified_claim.id)} is a {identified_claim.type} claim for ₹{float(identified_claim.claimed_amount):,.2f}. Its current status is {identified_claim.status}.{approved}"}
+
+    identified_policy = next((policy for policy in policies if _matches_question(_policy_number(policy.id), question) or _matches_question(policy.id, question)), None)
+    if identified_policy or any(term in query for term in ("coverage", "deductible", "premium", "policy")):
+        selected = [identified_policy] if identified_policy else policies
+        if not selected:
+            return {"reply": "You do not currently have a policy on file."}
+        lines = ["Your policy information:"]
+        for policy in selected:
+            lines.append(f"• {_policy_number(policy.id)} — {policy.name} ({policy.status}); coverage ₹{float(policy.coverage_amount):,.2f}, deductible ₹{float(policy.deductible or 0):,.2f}, premium ₹{float(policy.premium_amount):,.2f}. {policy.coverage_details or ''}".strip())
+        return {"reply": "\n".join(lines)}
+
+    if any(term in query for term in ("claim", "status", "filed")):
+        if not claims:
+            return {"reply": "You have not filed any claims yet."}
+        return {"reply": "Your claims:\n" + "\n".join(f"• {_claim_number(claim.id)} — {claim.type} claim for ₹{float(claim.claimed_amount):,.2f}; status: {claim.status}." for claim in claims)}
+
+    return {"reply": f"Hello {customer.name}. You have {len(policies)} policy or policies and {len(claims)} claim(s) on your account. Ask me about policy coverage, a claim status, or a specific policy or claim number."}
 
 
 @router.post("/copilot/search", response_model=SearchResponse)

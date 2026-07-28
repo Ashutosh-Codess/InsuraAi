@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="InsurAI Agent Claims Copilot">
+  <title>Agent Claims Copilot - InsurAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="/pages/fraud-monitor.html" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center">A</div>
+          <span class="font-bold text-white text-lg">Insur<span class="text-indigo-400">AI</span></span>
+        </a>
+        <span class="text-xs bg-rose-950 text-rose-400 border border-rose-800 px-2 py-0.5 rounded-md">Agent Portal</span>
+        <a href="/pages/fraud-monitor.html" class="ml-3 text-xs font-bold text-slate-300 hover:text-white">Fraud Monitor</a>
+        <span class="px-3 py-1.5 rounded-lg bg-indigo-600 text-xs font-bold text-white">Agent Copilot</span>
+      </div>
+      <div id="nav-user-info"></div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8 flex-1 w-full flex flex-col">
+    <div class="mb-6">
+      <h1 class="text-3xl font-extrabold text-white">Agent Claims Copilot</h1>
+      <p class="text-slate-400 text-sm">Ask about a claim, risk level, customer, policy, or review queue.</p>
+    </div>
+    <div id="copilot-chat-container" class="flex-1 min-h-[550px]"></div>
+  </main>
+
+  <script src="/assets/js/state.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/nav.js"></script>
+  <script src="/components/chat.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Auth.getUser();
+      if (!user || !['agent', 'admin'].includes(user.role)) {
+        window.location.replace('/pages/dashboard.html');
+        return;
+      }
+      ChatComponent.init('copilot-chat-container');
+    });
+  </script>
+</body>
+</html>
