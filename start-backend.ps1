@@ -35,7 +35,13 @@ if ([string]::IsNullOrEmpty($env:OLLAMA_BASE_URL)) {
     $env:OLLAMA_BASE_URL = "http://127.0.0.1:11434"
 }
 
-# 6. Run the server
+# 6. Start quickly for portal login. AI components load only when explicitly
+# requested, so an unavailable model service cannot prevent authentication.
+if ([string]::IsNullOrEmpty($env:INSURAMIND_SKIP_AI_STARTUP)) {
+    $env:INSURAMIND_SKIP_AI_STARTUP = "1"
+}
+
+# 7. Run the server
 Write-Host "Starting FastAPI server..." -ForegroundColor Green
 Set-Location backend
 uvicorn main:app --reload --host 127.0.0.1 --port 8000

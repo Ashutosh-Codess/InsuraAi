@@ -33,8 +33,11 @@ const API = {
     } catch (error) {
       const message = error.name === 'AbortError'
         ? 'The server did not respond within 20 seconds. Check that the backend is running.'
-        : (error.message || 'Network Error');
+        : error instanceof TypeError
+          ? 'Cannot reach the backend. Start it with .\\start-backend.ps1, then try again.'
+          : (error.message || 'Network Error');
       UI.toast(message, 'error');
+      error.userMessage = message;
       throw error;
     } finally {
       window.clearTimeout(timeout);

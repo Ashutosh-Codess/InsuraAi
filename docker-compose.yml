@@ -40,6 +40,7 @@ services:
       - .env
     environment:
       OLLAMA_BASE_URL: http://ollama:11434
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://insuramind:insuramind@db:5432/insuramind}
       PYTHONPATH: "/:/app"
     ports:
       - "8000:8000"

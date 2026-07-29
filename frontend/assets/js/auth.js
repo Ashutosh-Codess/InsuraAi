@@ -21,7 +21,11 @@ const Auth = {
         window.location.href = '/pages/dashboard.html';
       }
     } catch (err) {
-      UI.toast('Login failed: ' + err.message, 'error');
+      // API.request already presents connection and response errors. Avoid
+      // showing two notifications for a single failed sign-in attempt.
+      if (!err.userMessage) {
+        UI.toast('Login failed: ' + err.message, 'error');
+      }
     } finally {
       UI.hideLoading();
     }
