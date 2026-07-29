@@ -1,5 +1,10 @@
 const Auth = {
   async login(email, password, role = 'customer') {
+    console.log('LOGIN DEBUG', {
+        email,
+        password,
+        passwordLength: password?.length
+    });
     UI.showLoading();
     try {
       const response = await API.postForm('/auth/login', { username: email, password });
@@ -55,3 +60,4 @@ const Auth = {
   }
 };
 window.Auth = Auth;
+
