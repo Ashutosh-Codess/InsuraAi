@@ -37,10 +37,10 @@ router = APIRouter()
 
 # Local Ollama server — defaults to 127.0.0.1 for local dev.
 # In Docker the env var is set to http://ollama:11434/v1
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434/v1")
+OLLAMA_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
 # Llama 3 is substantially more reliable at following the grounded-answer
 # prompt than the tiny 0.5B model previously used as the default.
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3")
+OLLAMA_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 # Capped so long prompts don't stall the browser for minutes.
 MAX_TOKENS = int(os.getenv("COPILOT_MAX_TOKENS", "400"))
@@ -56,7 +56,7 @@ def get_client() -> OpenAI:
             base_url += "/v1"
         _client = OpenAI(
             base_url=base_url,
-            api_key="ollama",
+            api_key=os.getenv("GROQ_API_KEY"),
             http_client=httpx.Client(timeout=90),
         )
     return _client
@@ -337,3 +337,7 @@ def ask_copilot(
             print(f"[copilot] low faithfulness answer flagged: {faithfulness}")
 
     return StreamingResponse(stream(), media_type="text/plain")
+
+
+
+
