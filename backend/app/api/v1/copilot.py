@@ -315,8 +315,9 @@ def ask_copilot(
                 full_answer += delta
                 yield delta
 
-        except APIConnectionError:
+        except APIConnectionError as exc:
             # Ollama is not running — fall back to showing the raw retrieved context
+            print(f"GROQ APIConnectionError: {exc}")
             fallback = (
                 "[Copilot AI is currently offline. Here is the relevant policy information "
                 "retrieved from the knowledge base:]\n\n" + context_text
@@ -337,6 +338,7 @@ def ask_copilot(
             print(f"[copilot] low faithfulness answer flagged: {faithfulness}")
 
     return StreamingResponse(stream(), media_type="text/plain")
+
 
 
 
