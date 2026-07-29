@@ -21,9 +21,6 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.9
 
 # Multi-agent orchestration
-crewai==0.83.0
-crewai-tools==0.76.0
-pydantic-ai==0.0.14
 
 # --- Pinned transitive deps of crewai / pydantic-ai ---
 # crewai declares these as loose ranges (e.g. "litellm>=1.44.22"), which
