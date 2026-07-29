@@ -1,5 +1,5 @@
 const API = {
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: 'https://insuraai-backend.onrender.com/api/v1',
   async request(endpoint, options = {}) {
     const controller = new AbortController();
     const { timeoutMs = 20000, ...fetchOptions } = options;
