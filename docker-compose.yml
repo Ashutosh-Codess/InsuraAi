@@ -30,7 +30,7 @@ services:
       echo 'Waiting for Ollama to be ready...';
       while ! curl -s http://ollama:11434/api/tags > /dev/null; do sleep 2; done;
       echo 'Ollama is ready. Pulling llama3 model...';
-      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"qwen2.5:0.5b\"}';
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3\"}';
       echo 'Model pulled successfully.';
       "
 
@@ -40,6 +40,7 @@ services:
       - .env
     environment:
       OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: llama3
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://insuramind:insuramind@db:5432/insuramind}
       PYTHONPATH: "/:/app"
     ports:

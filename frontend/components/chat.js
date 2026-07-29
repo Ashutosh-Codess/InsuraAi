@@ -3,6 +3,7 @@ const ChatComponent = {
   init(containerId) {
     this.container = document.getElementById(containerId);
     if (!this.container) return;
+    this.messages = [];
     this.render();
     this.bindEvents();
   },
@@ -50,7 +51,10 @@ const ChatComponent = {
       input.value = '';
       this.appendTyping();
       try {
-        const response = await API.post('/copilot/contextual-chat', { message: text });
+        const response = await API.post('/copilot/contextual-chat', {
+          message: text,
+          history: this.messages.slice(-6)
+        }, { timeoutMs: 90000 });
         this.removeTyping();
         this.appendMessage('assistant', response.reply || 'I could not generate a response.');
       } catch (err) {
@@ -76,6 +80,7 @@ const ChatComponent = {
     `;
     list.appendChild(msgEl);
     list.scrollTop = list.scrollHeight;
+    this.messages.push({ role, text: String(text) });
   },
   appendTyping() {
     const list = document.getElementById('chat-messages');

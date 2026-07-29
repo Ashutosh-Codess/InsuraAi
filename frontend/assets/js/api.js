@@ -2,7 +2,8 @@ const API = {
   baseURL: 'http://localhost:8000/api/v1',
   async request(endpoint, options = {}) {
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 20000);
+    const { timeoutMs = 20000, ...fetchOptions } = options;
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
     const token = Store.get('token');
     const headers = { ...options.headers };
     if (!headers['Content-Type'] && !(options.body instanceof FormData)) {
@@ -12,7 +13,7 @@ const API = {
       headers['Authorization'] = `Bearer ${token}`;
     }
     const config = {
-      ...options,
+      ...fetchOptions,
       headers
     };
     try {
@@ -46,8 +47,9 @@ const API = {
   get(endpoint) {
     return this.request(endpoint, { method: 'GET' });
   },
-  post(endpoint, body) {
+  post(endpoint, body, options = {}) {
     return this.request(endpoint, {
+      ...options,
       method: 'POST',
       body: JSON.stringify(body)
     });
